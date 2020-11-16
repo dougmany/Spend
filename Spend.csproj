@@ -5,7 +5,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Twilio.AspNet.Mvc" Version="5.37.2" />
+    <PackageReference Include="Dapper" Version="2.0.35" />
+    <PackageReference Include="Microsoft.Data.Sqlite" Version="5.0.0" />
   </ItemGroup>
 
 </Project>

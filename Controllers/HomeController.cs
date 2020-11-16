@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Spend.Data;
 using Spend.Models;
 
 namespace Spend.Controllers
@@ -12,15 +13,25 @@ namespace Spend.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
+        private readonly ISpendRepository _repository;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(ILogger<HomeController> logger, ISpendRepository repository)
         {
             _logger = logger;
+            _repository = repository;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            return View(await _repository.Get());
+        }
+
+        // POST api/
+        [HttpPost]
+        public async Task Create([FromBody] Entry entry)
+        {
+            entry.Entered = DateTime.Now;
+            await _repository.Create(entry);
         }
 
         public IActionResult Privacy()
