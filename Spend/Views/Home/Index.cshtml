@@ -1,0 +1,14 @@
+﻿@model IEnumerable<Spend.Models.Entry>
+@{
+    ViewData["Title"] = "Home Page";
+}
+
+<div class="text-center">
+    <h1 class="display-4">Welcome</h1>
+    <ul>
+          @foreach(var entry in @Model)
+    {
+      <li>@entry.Name @entry.Description $@entry.Amount @entry.Entered</li>
+    }
+    </ul>
+</div>
