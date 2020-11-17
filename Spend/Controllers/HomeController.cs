@@ -34,10 +34,11 @@ namespace Spend.Controllers
         
         // POST api/
         [HttpPost]
-        public async Task Create([FromBody] Entry entry)
+        public async Task<IActionResult> Create([FromForm] Entry entry)
         {
             entry.Entered = DateTime.Now;
             await _repository.Create(entry);
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()
