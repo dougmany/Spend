@@ -14,11 +14,13 @@ namespace Spend.Controllers
     {
         private readonly ILogger<SmsController> _logger;
         private readonly ISpendRepository _repository;
+        private readonly SpendSettings _settings;
 
-        public SmsController(ILogger<SmsController> logger, ISpendRepository repository)
+        public SmsController(ILogger<SmsController> logger, ISpendRepository repository, SpendSettings settings)
         {
             _logger = logger;
             _repository = repository;
+            _settings = settings;
         }
 
         [HttpPost]
@@ -38,7 +40,7 @@ namespace Spend.Controllers
                 Entered = DateTime.Now,
                 Description = request.Body,
                 Name = message[0],
-                Amount = amount
+                Amount = new DbDecimal(amount)
             };
 
             await _repository.Create(entry);
