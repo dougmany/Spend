@@ -1,4 +1,5 @@
 
+using Dapper;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -6,6 +7,7 @@ using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Spend.Data;
+using Spend.Models;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -28,6 +30,8 @@ namespace Spend
             services.AddControllersWithViews();
 
             services.AddSingleton(new DatabaseConfig { Name = Configuration["DatabaseName"] });
+
+            SqlMapper.AddTypeHandler(typeof(DbDecimal), new DbDecimalTypeHandler());
 
             services.AddSingleton<IDatabaseBootstrap, DatabaseBootstrap>();
             services.AddSingleton<ISpendRepository, SpendRepository>();
