@@ -15,8 +15,7 @@ namespace Spend.Models
         {
             get 
             {
-                var local = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
-                return Entered.Add(local.BaseUtcOffset).ToString("g");
+                return Entered.AddHours(-8).ToString("g");
             }
         }
     }
