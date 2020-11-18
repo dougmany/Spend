@@ -11,6 +11,13 @@ namespace Spend.Models
     public DateTime Entered { get; set; }
     public String FromPhone { get; set; }
 
-    public String DateString { get { return Entered.ToLocalTime().ToString("g"); } }
+    public String DateString 
+        {
+            get 
+            {
+                var local = TimeZoneInfo.FindSystemTimeZoneById("Pacific Standard Time");
+                return Entered.Add(local.BaseUtcOffset).ToString("g");
+            }
+        }
     }
 }
