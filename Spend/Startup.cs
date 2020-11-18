@@ -32,8 +32,6 @@ namespace Spend
             services.AddSingleton(new DatabaseConfig { Name = Configuration["DatabaseName"] });
             services.AddSingleton(new SpendSettings { ReplyToText = Configuration["ReplyToText"] });
 
-            SqlMapper.AddTypeHandler(typeof(DbDecimal), new DbDecimalTypeHandler());
-
             services.AddSingleton<IDatabaseBootstrap, DatabaseBootstrap>();
             services.AddSingleton<ISpendRepository, SpendRepository>();
         }

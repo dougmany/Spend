@@ -27,11 +27,16 @@ namespace Spend.Controllers
         public async Task<TwiMLResult> Create(SmsRequest request)
         {
             var message = request.Body.Split(":");
-            var amount = 0m;
+            var amount = 0.0m;
 
             if (message.Length > 1)
             {
-                Decimal.TryParse(message[1].Replace("$", ""), out amount);
+                var amountString = message[1].Replace("$", "");
+                if (!amountString.Contains("."))
+                {
+                    amountString = amountString + ".00";
+                }
+                Decimal.TryParse(amountString, out amount);
             }
 
             var entry = new Entry
@@ -40,7 +45,7 @@ namespace Spend.Controllers
                 Entered = DateTime.Now,
                 Description = request.Body,
                 Name = message[0],
-                Amount = new DbDecimal(amount)
+                Amount = amount
             };
 
             await _repository.Create(entry);
