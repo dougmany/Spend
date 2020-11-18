@@ -10,5 +10,7 @@ namespace Spend.Models
     public Decimal Amount { get; set; }
     public DateTime Entered { get; set; }
     public String FromPhone { get; set; }
-  }
+
+    public String DateString { get { return Entered.ToLocalTime().ToString("g"); } }
+    }
 }
