@@ -4,11 +4,16 @@
 }
 
 <div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <ul>
-          @foreach(var entry in @Model)
-    {
-      <li>@entry.Name: $@entry.Amount @entry.DateString</li>
-    }
-    </ul>
+    <h1 class="display-4">Items</h1>
+    <table class="table-bordered">
+        <tr>
+            <th>What</th>
+            <th>Amount</th>
+            <th>When</th>
+        </tr>
+        @foreach (var entry in @Model)
+        {
+            <tr><td>@entry.Name</td><td>$@entry.Amount</td><td>@entry.DateString</td></tr>
+        }
+    </table>
 </div>
