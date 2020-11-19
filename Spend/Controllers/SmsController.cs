@@ -27,15 +27,11 @@ namespace Spend.Controllers
         public async Task<TwiMLResult> Create(SmsRequest request)
         {
             var message = request.Body.Split(":");
-            var amount = 0.0m;
+            var amount = 0m;
 
             if (message.Length > 1)
             {
                 var amountString = message[1].Replace("$", "");
-                if (!amountString.Contains("."))
-                {
-                    amountString = amountString + ".00";
-                }
                 Decimal.TryParse(amountString, out amount);
             }
 
@@ -45,7 +41,7 @@ namespace Spend.Controllers
                 Entered = DateTime.Now,
                 Description = request.Body,
                 Name = message[0],
-                Amount = amount
+                Amount = amount.ToString("F2")
             };
 
             await _repository.Create(entry);

@@ -9,7 +9,7 @@ namespace Spend.Models
         public int Id { get; set; }
         public String Name { get; set; }
         public String Description { get; set; }
-        public Decimal Amount { get; set; }
+        public String Amount { get; set; }
         public DateTime Entered { get; set; }
         public String FromPhone { get; set; }
 

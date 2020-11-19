@@ -3,7 +3,6 @@ using Dapper;
 using Microsoft.Data.Sqlite;
 using System;
 using System.Linq;
-using System.Collections.Generic;
 
 namespace Spend.Data
 {
@@ -35,9 +34,9 @@ namespace Spend.Data
         @"Create Table Entry (
           Name VARCHAR(100) NOT NULL,
           Description VARCHAR(1000) NULL,
-          Amount DECIMAL(10,2) NULL,
+          Amount VARCHAR(20) NULL,
           Entered DATETIME NULL,
-          FromPhone NVARCHAR(20));"
+          FromPhone VARCHAR(20));"
         );
       }
     }
