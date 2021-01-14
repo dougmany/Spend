@@ -14,13 +14,11 @@ namespace Spend.Controllers
     {
         private readonly ILogger<SmsController> _logger;
         private readonly ISpendRepository _repository;
-        private readonly SpendSettings _settings;
 
-        public SmsController(ILogger<SmsController> logger, ISpendRepository repository, SpendSettings settings)
+        public SmsController(ILogger<SmsController> logger, ISpendRepository repository)
         {
             _logger = logger;
             _repository = repository;
-            _settings = settings;
         }
 
         [HttpPost]
@@ -28,11 +26,12 @@ namespace Spend.Controllers
         {
             var message = request.Body.Split(":");
             var amount = 0m;
+            var isNumber = false;
 
             if (message.Length > 1)
             {
                 var amountString = message[1].Replace("$", "");
-                Decimal.TryParse(amountString, out amount);
+                isNumber = Decimal.TryParse(amountString, out amount);
             }
 
             var entry = new Entry
@@ -47,7 +46,7 @@ namespace Spend.Controllers
             await _repository.Create(entry);
 
             var response = new MessagingResponse();
-            if (amount > 0m)
+            if (isNumber)
             {
                 response.Message($"Got it: ${amount}");
             }
