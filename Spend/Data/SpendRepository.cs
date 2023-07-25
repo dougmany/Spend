@@ -34,7 +34,7 @@ namespace Spend.Data
     {
       using (var connection = new SqliteConnection(_databaseConfig.Name))
       {
-        return await connection.QueryAsync<Entry>("SELECT rowid AS Id, Name, Description, Amount, Entered, FromPhone FROM Entry;");
+        return await connection.QueryAsync<Entry>("SELECT rowid AS Id, Name, Description, Amount, Entered, FromPhone FROM Entry ORDER BY Entered DESC;");
       }
     }
   }
