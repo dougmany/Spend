@@ -30,7 +30,13 @@ namespace Spend
             services.AddControllersWithViews();
 
             services.AddSingleton(new DatabaseConfig { Name = Configuration["DatabaseName"] });
-            services.AddSingleton(new SpendSettings { ReplyToText = Configuration["ReplyToText"] });
+            services.AddSingleton(new SpendSettings { 
+                ReplyToText = Configuration["ReplyToText"],
+                ToNumber = Configuration["ToNumber"],
+                VonageApiKey = Configuration["VonageApiKey"],
+                VonageApiSecret = Configuration["VonageApiSecret"],
+                VonageBrandName = Configuration["VonageBrandName"]
+            });
 
             services.AddSingleton<IDatabaseBootstrap, DatabaseBootstrap>();
             services.AddSingleton<ISpendRepository, SpendRepository>();
