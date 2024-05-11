@@ -82,12 +82,12 @@ namespace Spend.Controllers
                 responseMessage=$"Um: {message[0]}, {message[1]}";
             }
             
-            var response = await vonageClient.SmsClient.SendAnSmsAsync(new Vonage.Messaging.SendSmsRequest()
+            /*var response = await vonageClient.SmsClient.SendAnSmsAsync(new Vonage.Messaging.SendSmsRequest()
             {
                 To = sms.Msisdn,
                 From = _spendSettings.VonageBrandName,
                 Text = responseMessage
-            });
+            });*/
 
             return Ok();
         }
