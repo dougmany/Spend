@@ -89,7 +89,7 @@ namespace Spend.Controllers
                 Text = responseMessage
             });
 
-            return NoContent();
+            return Ok();
         }
     }
 }
