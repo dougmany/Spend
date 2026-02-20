@@ -1,4 +1,5 @@
 using System;
+using System.Text.RegularExpressions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
 using Spend.Data;
@@ -6,89 +7,73 @@ using Spend.Models;
 using System.Threading.Tasks;
 using Vonage.Messaging;
 using Vonage.Utility;
-using Vonage.SubAccounts;
-using Vonage;
-using Vonage.Request;
-using Twilio.Http;
 
 namespace Spend.Controllers
 {
     public class SmsVController : Controller
     {
-        private readonly ILogger<SmsController> _logger;
+        private readonly ILogger<SmsVController> _logger;
         private readonly ISpendRepository _repository;
-        private readonly ISpendSettings _spendSettings;
 
-        public SmsVController(ILogger<SmsController> logger, ISpendRepository repository, SpendSettings spendSettings)
+        public SmsVController(ILogger<SmsVController> logger, ISpendRepository repository)
         {
             _logger = logger;
             _repository = repository;
-            _spendSettings = spendSettings;
         }
 
         [HttpGet("smsv/inbound-sms")]
         public async Task<IActionResult> InboundSmsAsync()
         {
             var sms = WebhookParser.ParseQuery<InboundSms>(Request.Query);
-            var message = sms.Text.Split(":");
-            var amount = 0m;
-            var isNumber = false;
 
-            if (message.Length > 1)
+            if (string.IsNullOrWhiteSpace(sms?.Text))
             {
-                var amountString = message[1].Replace("$", "");
-                isNumber = Decimal.TryParse(amountString, out amount);
+                _logger.LogWarning("Received SMS with empty or null text.");
+                return Ok();
             }
 
-            Console.WriteLine($"SMS Received with message: {sms.Text}");
+            _logger.LogInformation("SMS received: {Text} from {From}", sms.Text, sms.Msisdn);
+
+            var parts = sms.Text.Split(":", 2);
+            string name;
+            decimal amount;
+
+            if (parts.Length >= 2)
+            {
+                // Standard format: description:amount
+                var amountString = parts[1].Replace("$", "").Trim();
+                if (!Decimal.TryParse(amountString, out amount))
+                {
+                    _logger.LogWarning("SMS ignored — could not parse amount '{AmountString}' from: {Text}", amountString, sms.Text);
+                    return Ok();
+                }
+                name = parts[0].Trim();
+            }
+            else
+            {
+                // Fallback: find a number anywhere in the text
+                var match = Regex.Match(sms.Text, @"\$?([\d]+(?:\.[\d]+)?)");
+                if (!match.Success || !Decimal.TryParse(match.Groups[1].Value, out amount))
+                {
+                    _logger.LogWarning("SMS ignored — no amount found. Expected 'description:amount'. Got: {Text}", sms.Text);
+                    return Ok();
+                }
+                name = sms.Text.Substring(0, match.Index).Trim().TrimEnd('-', ':', '_', ' ');
+                if (string.IsNullOrWhiteSpace(name))
+                    name = sms.Text;
+                _logger.LogInformation("SMS parsed via fallback (no ':' separator): Name={Name}, Amount={Amount}", name, amount);
+            }
 
             var entry = new Entry
             {
                 FromPhone = sms.Msisdn,
-                Entered = DateTime.Now,
+                Entered = DateTime.UtcNow,
                 Description = sms.Text,
-                Name = message[0],
+                Name = name,
                 Amount = amount.ToString("F2")
             };
 
-
-            var credentials = Credentials.FromApiKeyAndSecret(
-                _spendSettings.VonageApiKey,
-                _spendSettings.VonageApiSecret
-            );
-
             await _repository.Create(entry);
-            
-            var vonageClient = new VonageClient(credentials);
-
-            var responseMessage = "";
-
-            if (isNumber)
-            {
-                responseMessage = $"Got it: ${amount}";
-            }
-            else if(sms.Text.Contains("friend") || sms.Text.Contains("help"))
-            {
-
-                responseMessage = sms.Text switch
-                {
-                    string a when a.Contains("friend", StringComparison.OrdinalIgnoreCase) => "Yes",
-                    string b when b.Contains("help", StringComparison.OrdinalIgnoreCase) => "OK",
-                    _ => "I am not sure what you want"
-                };
-            }
-            else
-            {
-                responseMessage=$"Um: {message[0]}, {message[1]}";
-            }
-            
-            /*var response = await vonageClient.SmsClient.SendAnSmsAsync(new Vonage.Messaging.SendSmsRequest()
-            {
-                To = sms.Msisdn,
-                From = _spendSettings.VonageBrandName,
-                Text = responseMessage
-            });*/
-
             return Ok();
         }
     }

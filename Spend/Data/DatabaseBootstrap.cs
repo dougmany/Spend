@@ -32,11 +32,12 @@ namespace Spend.Data
 
       connection.Execute(
         @"Create Table Entry (
+          Id INTEGER PRIMARY KEY AUTOINCREMENT,
           Name VARCHAR(100) NOT NULL,
           Description VARCHAR(1000) NULL,
-          Amount VARCHAR(20) NULL,
+          Amount REAL NULL,
           Entered DATETIME NULL,
-          FromPhone VARCHAR(20));"
+          FromPhone VARCHAR(50));"
         );
       }
     }

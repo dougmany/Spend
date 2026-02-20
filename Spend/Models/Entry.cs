@@ -17,7 +17,8 @@ namespace Spend.Models
         {
             get
             {
-                return Entered.AddHours(-8).ToString("g");
+                var tz = TimeZoneInfo.FindSystemTimeZoneById("America/Los_Angeles");
+                return TimeZoneInfo.ConvertTimeFromUtc(Entered, tz).ToString("g");
             }
         }
     }
